@@ -2,45 +2,38 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
 import { auth, googleProvider } from "@/app/lib/firebase";
 import {
+  createUserWithEmailAndPassword,
   signInWithPopup,
-  signInWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
 
-export default function SignInPage() {
-  const router = useRouter();
+export default function SignUpPage() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  // Google Sign-in
-  const handleGoogleSignIn = async () => {
-  try {
-    const result = await signInWithPopup(auth, googleProvider);
-    const user = result.user;
+  // Google Sign-up
+  const handleGoogleSignUp = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+      console.log("Google Sign-up successful");
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
 
-    const token = await user.getIdToken();
-
-    Cookies.set("authToken", token, { expires: 1 });
-    Cookies.set("userEmail", user.email ?? "", { expires: 1 });
-
-    router.push("/dashboard");
-  } catch (err: any) {
-    setError(err.message);
-  }
-};
-
-  // Email/Password Sign-in
-  const handleEmailSignIn = async (e: React.FormEvent) => {
+  // Email/Password Sign-up
+  const handleEmailSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const userCred = await signInWithEmailAndPassword(auth, email, password);
-      const token = await userCred.user.getIdToken();
-      Cookies.set("authToken", token, { expires: 1 });
-      router.push("/dashboard");
+      const userCred = await createUserWithEmailAndPassword(auth, email, password);
+      if (name) {
+        await updateProfile(userCred.user, { displayName: name });
+      }
+      console.log("Email/Password Sign-up successful");
     } catch (err: any) {
       setError(err.message);
     }
@@ -48,6 +41,7 @@ export default function SignInPage() {
 
   return (
     <div className="flex h-screen">
+      {/* Left Column */}
       <div className="w-2/5 bg-gray-900 text-white flex flex-col justify-between p-8">
         <h1 className="text-4xl font-bold">Base</h1>
         <div className="self-end">
@@ -61,34 +55,52 @@ export default function SignInPage() {
         </div>
       </div>
 
+      {/* Right Column */}
       <div className="w-3/5 flex items-center justify-center">
         <div className="w-full max-w-md space-y-6 p-6">
-          <h2 className="text-3xl font-bold">Sign-in</h2>
+          {/* Heading */}
+          <h2 className="text-3xl font-bold">Sign-up</h2>
 
+          {/* Social Sign-up */}
           <div className="flex gap-4">
             <button
-              onClick={handleGoogleSignIn}
-              className="flex-1 flex items-center justify-center gap-2 border rounded-md py-2 cursor-pointer">
-                <Image src="/google.svg" alt="Google" width={20} height={20} />
-              Sign in with Google
+              onClick={handleGoogleSignUp}
+              className="flex-1 flex items-center justify-center gap-2 border rounded-md py-2 cursor-pointer"
+            >
+              <Image src="/google.svg" alt="Google" width={20} height={20} />
+              Sign up with Google
             </button>
-
             <button
               disabled
-              className="flex-1 flex items-center justify-center gap-2 border rounded-md py-2 bg-gray-200 cursor-pointer text-gray-700">
-                <Image src="/apple.svg" alt="Apple" width={20} height={20} />
-              Sign in with Apple
+              className="flex-1 flex items-center justify-center gap-2 border rounded-md py-2 bg-gray-200 cursor-pointer text-gray-700"
+            >
+              <Image src="/apple.svg" alt="Apple" width={20} height={20} />
+              Sign up with Apple
             </button>
           </div>
 
+          {/* Divider */}
           <div className="flex items-center gap-2">
             <hr className="flex-1 border-gray-300" />
-            <span className="text-gray-500 text-sm">or continue with</span>
+            <span className="text-gray-500 text-sm">or sign up with</span>
             <hr className="flex-1 border-gray-300" />
           </div>
 
-          
-          <form onSubmit={handleEmailSignIn} className="space-y-4">
+          {/* Email/Password Sign-up Form */}
+          <form onSubmit={handleEmailSignUp} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Full Name
+              </label>
+              <input
+                type="text"
+                className="w-full border rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="John Doe"
+              />
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Email address
@@ -119,18 +131,18 @@ export default function SignInPage() {
               type="submit"
               className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
             >
-              Sign in
+              Create account
             </button>
           </form>
 
-          {error && (
-            <p className="text-sm text-red-600 text-center">{error}</p>
-          )}
+          {/* Error Message */}
+          {error && <p className="text-sm text-red-600 text-center">{error}</p>}
 
+          {/* Redirect to Sign-in */}
           <p className="text-sm text-center text-gray-600">
-            Don’t have an account?{" "}
-            <a href="/signup" className="text-blue-600 hover:underline">
-              Sign up
+            Already have an account?{" "}
+            <a href="/" className="text-blue-600 hover:underline">
+              Sign in
             </a>
           </p>
         </div>
@@ -138,4 +150,3 @@ export default function SignInPage() {
     </div>
   );
 }
-
