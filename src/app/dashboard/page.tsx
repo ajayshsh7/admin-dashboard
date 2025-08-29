@@ -80,21 +80,21 @@ export default function DashboardPage() {
 
       <div className="flex flex-col md:flex-row gap-6">
         <div className={cardStyle}>
-          <h2 className="text-lg font-semibold">Total Revenue</h2>
+          <h2 className="text-lg font-semibold text-gray-700">Total Revenue</h2>
           <p className="text-2xl font-bold text-green-600">
             ₹{totalRevenue.toLocaleString()}
           </p>
         </div>
 
         <div className={cardStyle}>
-          <h2 className="text-lg font-semibold">Total Transactions</h2>
+          <h2 className="text-lg font-semibold text-gray-700">Total Transactions</h2>
           <p className="text-2xl font-bold text-blue-600">
             {totalTransactions}
           </p>
         </div>
 
         <div className={cardStyle}>
-          <h2 className="text-lg font-semibold">Total Users</h2>
+          <h2 className="text-lg font-semibold text-gray-700">Total Users</h2>
           <p className="text-2xl font-bold text-purple-600">{totalUsers}</p>
         </div>
       </div>
