@@ -1,39 +1,33 @@
 import { NextResponse } from "next/server";
-import { adminDb } from "@/app/lib/firebaseAdmin";
-import { db } from "@/app/lib/firebase";
+import { db } from "@/app/lib/firebase"; // client firebase.ts
 import { collection, addDoc } from "firebase/firestore";
-import { seedTransactions, seedRevenue } from "@/app/lib/seedUsers";
-import { seedUsers } from "@/app/lib/seedUsers";
+import { seedUsers, seedTransactions } from "@/app/lib/seedUsers"; 
 
 export async function GET() {
-    try {
-    for (const user of seedUsers) {
-      await adminDb.collection("users").add(user);
-    }
-
-    return NextResponse.json({ message: "Seeding successful" });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
-  }
-    
   try {
-    // Seed users
+    // Seed Users
     for (const user of seedUsers) {
       await addDoc(collection(db, "users"), user);
     }
 
-    // Seed transactions
+    // Seed Transactions
     for (const tx of seedTransactions) {
       await addDoc(collection(db, "transactions"), tx);
     }
 
-    // Seed revenue
+    // Seed Revenue (optional example)
+    const seedRevenue = [
+      { source: "subscription", amount: 500, date: new Date().toISOString() },
+      { source: "ads", amount: 250, date: new Date().toISOString() },
+    ];
+
     for (const rev of seedRevenue) {
       await addDoc(collection(db, "revenue"), rev);
     }
 
-    return NextResponse.json({ message: "Seeding successful ✅" });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ message: "Users, Transactions, and Revenue seeded ✅" });
+  } catch (error) {
+    console.error("Seeding failed:", error);
+    return NextResponse.json({ error: "Seeding failed" }, { status: 500 });
   }
 }
