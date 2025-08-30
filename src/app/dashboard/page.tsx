@@ -21,13 +21,14 @@ export default function DashboardPage() {
   const cardStyle = "flex flex-col items-center justify-center bg-white shadow rounded-xl p-6 w-full md:w-1/3";
 
   const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+
    useEffect(() => {
     const fetchData = async () => {
       try {
         const transactionsSnap = await getDocs(collection(db, "transactions"));
         setTotalTransactions(transactionsSnap.size);
 
-        // Prepare chart data
+        // chart data
         const dailyMap: Record<string, { transactions: number; revenue: number }> = {};
         transactionsSnap.forEach((doc) => {
           const data = doc.data();
@@ -60,16 +61,18 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
-      if (!user) router.push("/");
-      else if (user.email === ADMIN_EMAIL) setIsAdmin(true);
-      else router.push("/");
-      setLoading(false);
-    });
-    return () => unsub();
+    if (!user) {
+      router.push("/"); 
+    } else if (user.email === ADMIN_EMAIL) {
+      setIsAdmin(true); 
+    }
+    setLoading(false); 
+  });
+
+  return () => unsub();
   }, [router]);
 
   if (loading) return <div className="p-6">Loading...</div>;
-  if (!isAdmin) return <div className="p-6">Access Denied ❌</div>;
 
   return (
      <div className="max-w-[100rem] mx-auto">

@@ -46,7 +46,7 @@ export default function SettingsPage() {
       // Optionally, you can handle profile picture upload to Firebase Storage here
       // and then call updateProfile({ photoURL: downloadURL })
 
-      setMessage("Profile updated successfully ✅");
+      setMessage("Profile updated successfully");
     } catch (err: any) {
       setMessage(`Error: ${err.message}`);
     }
